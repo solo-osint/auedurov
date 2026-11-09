@@ -18,4 +18,4 @@ function crossings(paths,{timeBudgetMs=Infinity}={}){const deadline=Date.now()+t
 return{route,rounded,crossings,portAssignments};
 })();
 
-self.onmessage=({data})=>{try{const start=Date.now(),routes=EdgeRouter.route(data.nodes,data.edges,{timeBudgetMs:3000}),bridges=EdgeRouter.crossings(routes,{timeBudgetMs:400});const result=routes.map(r=>({id:r.id,d:EdgeRouter.rounded(r.points,bridges.get(r.id)||[])}));self.postMessage({id:data.id,routes:result,partial:routes.length<data.edges.length,elapsed:Date.now()-start})}catch(e){self.postMessage({id:data.id,routes:[],partial:true,error:String(e.message)})}};
+self.onmessage=({data})=>{try{const start=Date.now(),routes=EdgeRouter.route(data.nodes,data.edges,{timeBudgetMs:600}),bridges=EdgeRouter.crossings(routes,{timeBudgetMs:120});const result=routes.map(r=>({id:r.id,d:EdgeRouter.rounded(r.points,bridges.get(r.id)||[])}));self.postMessage({id:data.id,routes:result,partial:routes.length<data.edges.length,elapsed:Date.now()-start})}catch(e){self.postMessage({id:data.id,routes:[],partial:true,error:String(e.message)})}};
