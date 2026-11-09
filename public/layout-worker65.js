@@ -7,6 +7,17 @@ const GraphLayout65=(()=>{
 })();
 
 
+const GraphLayout66=(()=>{
+ const rank={phone:1,email:2,username:3,address:4,date:5,profilefact:6,organization:7,employment:8,income:9,education:10};
+ function cards(nodes,edges,aspect=1.6){if(!nodes.length)return{positions:{},panels:[]};const model=GraphLayout65.groups(nodes,edges),positions={},panels=[];
+ for(const group of model.groups){const ids=group.ids.filter(id=>id!==group.root),available=new Set(ids),branches=[];while(available.size){const seed=[...available].sort((a,b)=>(rank[model.map.get(a).type]??15)-(rank[model.map.get(b).type]??15)||String(model.map.get(a).label).localeCompare(String(model.map.get(b).label),'ru'))[0],queue=[seed],branch=[];available.delete(seed);for(let q=0;q<queue.length;q++){const id=queue[q];branch.push(id);for(const other of model.adj.get(id)||[])if(available.has(other)){available.delete(other);queue.push(other)}}branches.push(branch)}
+ const total=ids.length,cols=group.root?(total<=8?2:4):Math.min(5,Math.max(1,Math.ceil(Math.sqrt(total*1.4)))),columns=Array.from({length:cols},()=>[]),capacity=Math.max(1,Math.ceil(total/cols));for(const branch of branches)for(let start=0;start<branch.length;start+=capacity){const target=columns.reduce((best,c,i)=>c.length<columns[best].length?i:best,0);columns[target].push(...branch.slice(start,start+capacity))}
+ const rows=Math.max(1,...columns.map(c=>c.length)),stepX=426,stepY=222,hasRoot=!!group.root,centerCol=cols/2,rootX=185+centerCol*stepX,rootY=115+(rows-1)*stepY/2,local={};if(hasRoot)local[group.root]={x:rootX,y:rootY};for(let col=0;col<cols;col++){const x=185+(hasRoot&&col>=centerCol?col+1:col)*stepX,column=columns[col];column.forEach((id,row)=>local[id]={x,y:115+(row+(rows-column.length)/2)*stepY})}const w=(cols+(hasRoot?1:0)-1)*stepX+370,h=(rows-1)*stepY+230;panels.push({...group,w,h,local})}
+ const area=panels.reduce((a,p)=>a+(p.w+150)*(p.h+150),0),target=Math.max(...panels.map(p=>p.w),Math.sqrt(area*Math.max(.85,aspect)));let x=0,y=0,rowH=0;for(const p of panels){if(x&&x+p.w>target){x=0;y+=rowH+170;rowH=0}for(const id of p.ids)positions[id]={x:x+p.local[id].x,y:y+p.local[id].y};p.x=x;p.y=y;delete p.local;x+=p.w+170;rowH=Math.max(rowH,p.h)}
+ const occupied=[];for(const n of nodes.filter(n=>n.pinned)){positions[n.id]={x:Number(n.x)||0,y:Number(n.y)||0};occupied.push(positions[n.id])}for(const n of nodes.filter(n=>!n.pinned)){let p=positions[n.id],i=0;while(occupied.some(q=>Math.abs(p.x-q.x)<326&&Math.abs(p.y-q.y)<168)&&i++<3000)p={x:p.x+426,y:p.y+(i%7===0?222:0)};positions[n.id]=p;occupied.push(p)}for(const p of panels){const all=p.ids.map(id=>positions[id]);p.x=Math.min(...all.map(n=>n.x))-174;p.y=Math.min(...all.map(n=>n.y))-110;p.w=Math.max(...all.map(n=>n.x))+174-p.x;p.h=Math.max(...all.map(n=>n.y))+110-p.y}return{positions,panels}}
+ return{cards};
+})();
+
 const DossierLayout=(()=>{
 const isSource=n=>n.type==='document'||n.type==='image';
 function arrange(nodes,edges,{aspect=1.4,mode='dossier'}={}){
@@ -39,4 +50,4 @@ function arrange(nodes,edges,{aspect=1.4,mode='dossier'}={}){
 return{arrange,isSource};
 })();
 
-self.onmessage=({data})=>{try{let result;if(data.mode==='network')result=GraphLayout65.network(data.nodes,data.edges);else if(data.mode==='sources'){const r=DossierLayout.arrange(data.nodes,data.edges,{aspect:data.aspect||1.5,mode:'dossier'});result={positions:Object.fromEntries(r.positions),panels:r.panels}}else result=GraphLayout65.cards(data.nodes,data.edges,data.aspect||1.5);self.postMessage({id:data.id,...result})}catch(e){self.postMessage({id:data.id,error:String(e.message)})}};
+self.onmessage=({data})=>{try{let result;if(data.mode==='network')result=GraphLayout65.network(data.nodes,data.edges);else if(data.mode==='sources'){const r=DossierLayout.arrange(data.nodes,data.edges,{aspect:data.aspect||1.5,mode:'dossier'});result={positions:Object.fromEntries(r.positions),panels:r.panels}}else result=GraphLayout66.cards(data.nodes,data.edges,data.aspect||1.5);self.postMessage({id:data.id,...result})}catch(e){self.postMessage({id:data.id,error:String(e.message)})}};
