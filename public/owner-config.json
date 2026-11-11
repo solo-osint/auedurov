@@ -1,4 +1,10 @@
 {
   "version": 1,
-  "sha256": "105eea2d4644b29ef4f5e00042e3377ba2e85fd735af340a4799179e16e4a4fe"
+  "sha256": "3b0e3eee5ebe9416b52cc9afa725646352f927afe3e37bc3fa5278f1ac52c84c",
+  "profileId": "local-1d4787d0d859fea5757664cd7c38cb200881e21d5a87ddb53fcf6b97dd7c145b",
+  "name": "auedurov",
+  "rotation": "owner-6.8",
+  "revoked": [
+    "local-df3e7b9f6f72b2e5545c62c690d10b2dbda4c1ac80a0637f2264a22815e11ad7"
+  ]
 }
